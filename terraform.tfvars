@@ -8,5 +8,5 @@ AMIS = {
 }
 
 
-AZURE_REGION = "westus"
+AZURE_REGION = "eastus"
 
