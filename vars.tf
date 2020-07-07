@@ -19,7 +19,6 @@ variable "AMIS" {
     }
 }
 
-
 variable "AZURE_SUBSCRIPTION_IT" {}
 
 variable "AZURE_TENANT_ID" {}
