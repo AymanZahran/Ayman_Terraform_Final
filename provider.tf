@@ -9,4 +9,5 @@ provider "azurerm" {
     use_msi = true
     subscription_id = var.AZURE_SUBSCRIPTION_IT
     tenant_id       = var.AZURE_TENANT_ID
+    client_id       = var.AZURE_CLIENT_ID
 }
