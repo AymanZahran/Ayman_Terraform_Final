@@ -3,3 +3,10 @@ provider "aws" {
   secret_key = var.AWS_SECRET_KEY
   region     = var.AWS_REGION
 }
+
+provider "azurerm" {
+    version = "~>1.32.0"
+    use_msi = true
+    subscription_id = var.AZURE_SUBSCRIPTION_IT
+    tenant_id       = var.AZURE_TENANT_ID
+}
