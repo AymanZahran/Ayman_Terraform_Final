@@ -1,6 +1,6 @@
 #AWS Resources
 # resource "aws_instance" "example" {
-#   ami           = var.AMIS[var.AWS_REGION]
+#   ami           = var.AWS_AMI
 #   instance_type = var.AWS_INSTANCE_TYPE
 # }
 
