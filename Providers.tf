@@ -7,7 +7,7 @@
 
 #Azure Provider
 provider "azurerm" {
-    use_msi = false
+    use_msi = true
     subscription_id = "d855b6ab-0588-47f5-9095-3315e5745db0"
     tenant_id       = "ce1acd89-9604-42e5-b501-a3f292efe44d"
     #client_id       = "653b057f-56d0-456b-9d19-1ddc80181102"
