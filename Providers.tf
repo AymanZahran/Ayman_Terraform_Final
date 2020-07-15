@@ -5,6 +5,7 @@
 #   region     = var.AWS_REGION
 # }
 
+
 #Azure Provider
 provider "azurerm" {
     version = "<= 1.3"
