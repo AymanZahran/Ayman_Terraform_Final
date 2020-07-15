@@ -5,10 +5,9 @@
 #   region     = var.AWS_REGION
 # }
 
-
 #Azure Provider
 provider "azurerm" {
-    version = "<= 1.3"
+    version = "~>1.3.0"
     use_msi = true
     subscription_id = var.AZURE_SUBSCRIPTION_ID
     tenant_id       = var.AZURE_TENANT_ID
