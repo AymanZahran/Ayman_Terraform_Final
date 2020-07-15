@@ -7,12 +7,13 @@
 
 #Azure Provider
 provider "azurerm" {
-    version = "=2.0.0"
-    use_msi = true
+    version = "~>1.32.0"
+    #use_msi = true
     subscription_id = var.AZURE_SUBSCRIPTION_ID
     tenant_id       = var.AZURE_TENANT_ID
     #client_id       = var.AZURE_CLIENT_ID
     #client_secret   = var.AZURE_CLIENT_SECRET
+    features {}
 }
 
 #GCP Provider
