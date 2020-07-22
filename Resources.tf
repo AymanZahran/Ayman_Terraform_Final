@@ -1,4 +1,4 @@
-AWS Resources
+#AWS Resources
 resource "aws_instance" "example" {
   ami           = var.AWS_AMIS
   instance_type = var.AWS_INSTANCE_TYPE
