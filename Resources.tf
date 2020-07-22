@@ -1,6 +1,6 @@
 #AWS Resources
 resource "aws_instance" "example" {
-  ami           = var.AWS_AMIS
+  ami           = "ami-0d729a60"#var.AWS_AMIS
   instance_type = var.AWS_INSTANCE_TYPE
 }
 
