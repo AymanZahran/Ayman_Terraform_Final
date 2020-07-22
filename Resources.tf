@@ -1,14 +1,14 @@
-#AWS Resources
-# resource "aws_instance" "example" {
-#   ami           = var.AWS_AMI
-#   instance_type = var.AWS_INSTANCE_TYPE
-# }
+AWS Resources
+resource "aws_instance" "example" {
+  ami           = var.AWS_AMIS
+  instance_type = var.AWS_INSTANCE_TYPE
+}
 
 #Azure Resources
-resource "azurerm_resource_group" "rg" {
-    name     = "myTFResourceGroup"
-    location = var.AZURE_REGION
-}
+# resource "azurerm_resource_group" "rg" {
+#     name     = "myTFResourceGroup"
+#     location = var.AZURE_REGION
+# }
 
 #GCP Resources
 # resource "google_compute_network" "vpc_network" {
