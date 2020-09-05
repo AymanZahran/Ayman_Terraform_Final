@@ -4,6 +4,7 @@ provider "azurerm" {
     version = "~>2.0"
     features {}
     subscription_id = var.AZURE_SUBSCRIPTION_ID
+    tenant_id = var.AZURE_TENANT_ID
 }
 
 # #AWS Provider
