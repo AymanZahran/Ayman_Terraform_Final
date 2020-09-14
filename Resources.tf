@@ -1,11 +1,25 @@
-# Create a resource group if it doesn't exist
+# Configure the Azure provider
+terraform {
+  required_providers {
+    azurerm = {
+      source = "hashicorp/azurerm"
+      version = ">= 2.26"
+    }
+  }
+}
+
+provider "azurerm" {
+  features {}
+}
+
+#Create Resource Group
 resource "azurerm_resource_group" "myterraformgroup" {
     name     = "myResourceGroup"
     location = "eastus"
 
-    # tags = {
-    #     environment = "Terraform Demo"
-    # }
+    tags = {
+        environment = "Terraform Deploy"
+    }
 }
 
 # Create virtual network
@@ -16,7 +30,7 @@ resource "azurerm_virtual_network" "myterraformnetwork" {
     resource_group_name = azurerm_resource_group.myterraformgroup.name
 
     tags = {
-        environment = "Terraform Demo"
+        environment = "Terraform Deploy"
     }
 }
 
@@ -28,21 +42,43 @@ resource "azurerm_subnet" "myterraformsubnet" {
     address_prefixes       = ["10.0.1.0/24"]
 }
 
-# Create public IPs
-resource "azurerm_public_ip" "myterraformpublicip" {
-    name                         = "myPublicIP"
+# Create Public IP
+resource "azurerm_public_ip" "Master01_PublicIP" {
+    name                         = "Master01_PublicIP"
     location                     = "eastus"
     resource_group_name          = azurerm_resource_group.myterraformgroup.name
     allocation_method            = "Dynamic"
-
-    # tags = {
-    #     environment = "Terraform Demo"
-    # }
+    
+    tags = {
+        environment = "Terraform Deploy"
+    }
 }
 
-# Create Network Security Group and rule
-resource "azurerm_network_security_group" "myterraformnsg" {
-    name                = "myNetworkSecurityGroup"
+resource "azurerm_public_ip" "Node01_PublicIP" {
+    name                         = "Node01_PublicIP"
+    location                     = "eastus"
+    resource_group_name          = azurerm_resource_group.myterraformgroup.name
+    allocation_method            = "Dynamic"
+    
+    tags = {
+        environment = "Terraform Deploy"
+    }
+}
+
+resource "azurerm_public_ip" "Node02_PublicIP" {
+    name                         = "Node02_PublicIP"
+    location                     = "eastus"
+    resource_group_name          = azurerm_resource_group.myterraformgroup.name
+    allocation_method            = "Dynamic"
+    
+    tags = {
+        environment = "Terraform Deploy"
+    }
+}
+
+# Create NSG
+resource "azurerm_network_security_group" "Master01_NSG" {
+    name                = "Master01_NSG"
     location            = "eastus"
     resource_group_name = azurerm_resource_group.myterraformgroup.name
     
@@ -58,14 +94,60 @@ resource "azurerm_network_security_group" "myterraformnsg" {
         destination_address_prefix = "*"
     }
 
-    # tags = {
-    #     environment = "Terraform Demo"
-    # }
+    tags = {
+        environment = "Terraform Deploy"
+    }
 }
 
-# Create network interface
-resource "azurerm_network_interface" "myterraformnic" {
-    name                      = "myNIC"
+
+resource "azurerm_network_security_group" "Node01_NSG" {
+    name                = "Node01_NSG"
+    location            = "eastus"
+    resource_group_name = azurerm_resource_group.myterraformgroup.name
+    
+    security_rule {
+        name                       = "SSH"
+        priority                   = 1001
+        direction                  = "Inbound"
+        access                     = "Allow"
+        protocol                   = "Tcp"
+        source_port_range          = "*"
+        destination_port_range     = "22"
+        source_address_prefix      = "*"
+        destination_address_prefix = "*"
+    }
+
+    tags = {
+        environment = "Terraform Deploy"
+    }
+}
+
+
+resource "azurerm_network_security_group" "Node02_NSG" {
+    name                = "Node02_NSG"
+    location            = "eastus"
+    resource_group_name = azurerm_resource_group.myterraformgroup.name
+    
+    security_rule {
+        name                       = "SSH"
+        priority                   = 1001
+        direction                  = "Inbound"
+        access                     = "Allow"
+        protocol                   = "Tcp"
+        source_port_range          = "*"
+        destination_port_range     = "22"
+        source_address_prefix      = "*"
+        destination_address_prefix = "*"
+    }
+
+    tags = {
+        environment = "Terraform Deploy"
+    }
+}
+
+# Create NIC
+resource "azurerm_network_interface" "Master01_NIC" {
+    name                      = "Master01_NIC"
     location                  = "eastus"
     resource_group_name       = azurerm_resource_group.myterraformgroup.name
 
@@ -73,18 +155,63 @@ resource "azurerm_network_interface" "myterraformnic" {
         name                          = "myNicConfiguration"
         subnet_id                     = azurerm_subnet.myterraformsubnet.id
         private_ip_address_allocation = "Dynamic"
-        public_ip_address_id          = azurerm_public_ip.myterraformpublicip.id
+        public_ip_address_id          = azurerm_public_ip.Master01_PublicIP.id
     }
 
-    # tags = {
-    #     environment = "Terraform Demo"
-    # }
+    tags = {
+        environment = "Terraform Deploy"
+    }
+}
+
+
+resource "azurerm_network_interface" "Node01_NIC" {
+    name                      = "Node01_NIC"
+    location                  = "eastus"
+    resource_group_name       = azurerm_resource_group.myterraformgroup.name
+
+    ip_configuration {
+        name                          = "myNicConfiguration"
+        subnet_id                     = azurerm_subnet.myterraformsubnet.id
+        private_ip_address_allocation = "Dynamic"
+        public_ip_address_id          = azurerm_public_ip.Node01_PublicIP.id
+    }
+
+    tags = {
+        environment = "Terraform Deploy"
+    }
+}
+
+resource "azurerm_network_interface" "Node02_NIC" {
+    name                      = "Node02_NIC"
+    location                  = "eastus"
+    resource_group_name       = azurerm_resource_group.myterraformgroup.name
+
+    ip_configuration {
+        name                          = "myNicConfiguration"
+        subnet_id                     = azurerm_subnet.myterraformsubnet.id
+        private_ip_address_allocation = "Dynamic"
+        public_ip_address_id          = azurerm_public_ip.Node02_PublicIP.id
+    }
+
+    tags = {
+        environment = "Terraform Deploy"
+    }
 }
 
 # Connect the security group to the network interface
-resource "azurerm_network_interface_security_group_association" "example" {
-    network_interface_id      = azurerm_network_interface.myterraformnic.id
-    network_security_group_id = azurerm_network_security_group.myterraformnsg.id
+resource "azurerm_network_interface_security_group_association" "Master01_NSG_NIC" {
+    network_interface_id      = azurerm_network_interface.Master01_NIC.id
+    network_security_group_id = azurerm_network_security_group.Master01_NSG.id
+}
+
+resource "azurerm_network_interface_security_group_association" "Node01_NSG_NIC" {
+    network_interface_id      = azurerm_network_interface.Node01_NIC.id
+    network_security_group_id = azurerm_network_security_group.Node01_NSG.id
+}
+
+resource "azurerm_network_interface_security_group_association" "Node02_NSG_NIC" {
+    network_interface_id      = azurerm_network_interface.Node02_NIC.id
+    network_security_group_id = azurerm_network_security_group.Node02_NSG.id
 }
 
 # Generate random text for a unique storage account name
@@ -106,72 +233,151 @@ resource "azurerm_storage_account" "mystorageaccount" {
     account_replication_type    = "LRS"
 
     tags = {
-        environment = "Terraform Demo"
+        environment = "Terraform Deploy"
     }
 }
 
 # Create (and display) an SSH key
-resource "tls_private_key" "example_ssh" {
-  algorithm = "RSA"
-  rsa_bits = 4096
-}
-output "tls_private_key" { value = "${tls_private_key.example_ssh.private_key_pem}" }
+# resource "tls_private_key" "example_ssh" {
+#   algorithm = "RSA"
+#   rsa_bits = 4096
+# }
+# output "tls_private_key" { value = "${tls_private_key.example_ssh.private_key_pem}" }
 
 # Create virtual machine
-resource "azurerm_linux_virtual_machine" "myterraformvm" {
-    name                  = "myVM"
+resource "azurerm_linux_virtual_machine" "Master01" {
+    name                  = "Master01"
     location              = "eastus"
     resource_group_name   = azurerm_resource_group.myterraformgroup.name
-    network_interface_ids = [azurerm_network_interface.myterraformnic.id]
-    size                  = "Standard_DS1_v2"
+    network_interface_ids = [azurerm_network_interface.Master01_NIC.id]
+    size                  = "Standard_D2s_v3"
 
     os_disk {
-        name              = "myOsDisk"
+        name              = "Master_OS_Disk"
         caching           = "ReadWrite"
         storage_account_type = "Premium_LRS"
     }
 
     source_image_reference {
-        publisher = "Canonical"
-        offer     = "UbuntuServer"
-        sku       = "16.04.0-LTS"
+        publisher = "OpenLogic"
+        offer     = "CentOS"
+        sku       = "8_2-gen2"
         version   = "latest"
     }
 
-    computer_name  = "myvm"
-    admin_username = "azureuser"
-    disable_password_authentication = true
+    computer_name  = "Master01"
+    admin_username = "sysadmin"
+    admin_password = "P@ssw0rdP@ssw0rd"
+    disable_password_authentication = false
         
-    admin_ssh_key {
-        username       = "azureuser"
-        public_key     = tls_private_key.example_ssh.public_key_openssh
-    }
+    # admin_ssh_key {
+    #     username       = "sysadmin"
+    #     #public_key     = tls_private_key.example_ssh.public_key_openssh
+        
+    # }
 
     boot_diagnostics {
         storage_account_uri = azurerm_storage_account.mystorageaccount.primary_blob_endpoint
     }
 
-    # tags = {
-    #     environment = "Terraform Demo"
-    # }
+    tags = {
+        environment = "Terraform Deploy"
+    }
 }
 
-# #AWS Resources
-# resource "aws_instance" "example" {
-#   ami           = "ami-2757f631"
-#   #var.AWS_AMIS
-#   instance_type = var.AWS_INSTANCE_TYPE
-# }
+resource "azurerm_linux_virtual_machine" "Node01" {
+    name                  = "Node01"
+    location              = "eastus"
+    resource_group_name   = azurerm_resource_group.myterraformgroup.name
+    network_interface_ids = [azurerm_network_interface.Node01_NIC.id]
+    size                  = "Standard_DS1_v2"
 
-# #Azure Resources
-# # resource "azurerm_resource_group" "rg" {
-# #     name     = "myTFResourceGroup"
-# #     location = var.AZURE_REGION
-# # }
+    os_disk {
+        name              = "Node01_OS_Disk"
+        caching           = "ReadWrite"
+        storage_account_type = "Premium_LRS"
+    }
 
-# #GCP Resources
-# # resource "google_compute_network" "vpc_network" {
-# #   name = "terraform-network"
-# # }
+    source_image_reference {
+        publisher = "OpenLogic"
+        offer     = "CentOS"
+        sku       = "8_2-gen2"
+        version   = "latest"
+    }
 
+    computer_name  = "Node01"
+    admin_username = "sysadmin"
+    admin_password = "P@ssw0rdP@ssw0rd"
+    disable_password_authentication = false
+        
+    # admin_ssh_key {
+    #     username       = "sysadmin"
+    #     #public_key     = tls_private_key.example_ssh.public_key_openssh
+        
+    # }
+
+    boot_diagnostics {
+        storage_account_uri = azurerm_storage_account.mystorageaccount.primary_blob_endpoint
+    }
+
+    tags = {
+        environment = "Terraform Deploy"
+    }
+}
+
+resource "azurerm_linux_virtual_machine" "Node02" {
+    name                  = "Node02"
+    location              = "eastus"
+    resource_group_name   = azurerm_resource_group.myterraformgroup.name
+    network_interface_ids = [azurerm_network_interface.Node02_NIC.id]
+    size                  = "Standard_DS1_v2"
+
+    os_disk {
+        name              = "Node02_OS_Disk"
+        caching           = "ReadWrite"
+        storage_account_type = "Premium_LRS"
+    }
+
+    source_image_reference {
+        publisher = "OpenLogic"
+        offer     = "CentOS"
+        sku       = "8_2-gen2"
+        version   = "latest"
+    }
+
+    computer_name  = "Node02"
+    admin_username = "sysadmin"
+    admin_password = "P@ssw0rdP@ssw0rd"
+    disable_password_authentication = false
+        
+    # admin_ssh_key {
+    #     username       = "sysadmin"
+    #     #public_key     = tls_private_key.example_ssh.public_key_openssh
+        
+    # }
+
+    boot_diagnostics {
+        storage_account_uri = azurerm_storage_account.mystorageaccount.primary_blob_endpoint
+    }
+
+    tags = {
+        environment = "Terraform Deploy"
+    }
+}
+
+
+output "Master01-IP" {
+  value       = azurerm_public_ip.Master01_PublicIP
+  description = "Master01-IP"
+}
+
+output "Node01-IP" {
+  value       = azurerm_public_ip.Node01_PublicIP
+  description = "Master01-IP"
+}
+
+output "Node02-IP" {
+  value       = azurerm_public_ip.Node02_PublicIP
+  description = "Master01-IP"
+}
 
